@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <fcntl.h>
+#include <errno.h>
+#include <string.h>
 #include <string.h>
 #include <assert.h>
 #include <sys/types.h>
@@ -39,6 +41,7 @@ struct pipecmd {
 
 int fork1(void);  // Fork but exits on failure.
 struct cmd *parsecmd(char*);
+void path(char *buf);
 
 // Execute cmd.  Never returns.
 void
@@ -61,8 +64,8 @@ runcmd(struct cmd *cmd)
     ecmd = (struct execcmd*)cmd;
     if(ecmd->argv[0] == 0)
       exit(0);
-    fprintf(stderr, "exec not implemented\n");
-    // Your code here ...
+    execv(ecmd->argv[0], ecmd->argv);
+    perror("exec failed\n");
     break;
 
   case '>':
@@ -331,3 +334,4 @@ parseexec(char **ps, char *es)
   cmd->argv[argc] = 0;
   return ret;
 }
+
