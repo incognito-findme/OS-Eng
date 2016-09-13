@@ -64,7 +64,7 @@ runcmd(struct cmd *cmd)
     ecmd = (struct execcmd*)cmd;
     if(ecmd->argv[0] == 0)
       exit(0);
-    execv(ecmd->argv[0], ecmd->argv);
+    execvp(ecmd->argv[0], ecmd->argv);
     perror("exec failed\n");
     break;
 
