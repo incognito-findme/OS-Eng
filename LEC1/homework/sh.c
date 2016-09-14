@@ -51,6 +51,7 @@ runcmd(struct cmd *cmd)
   struct execcmd *ecmd;
   struct pipecmd *pcmd;
   struct redircmd *rcmd;
+  int redir_fd;
 
   if(cmd == 0)
     exit(0);
@@ -71,8 +72,11 @@ runcmd(struct cmd *cmd)
   case '>':
   case '<':
     rcmd = (struct redircmd*)cmd;
-    fprintf(stderr, "redir not implemented\n");
-    // Your code here ...
+    if (cmd->type == '>')
+	redir_fd = creat(rcmd->file, rcmd->mode);
+    else
+	redir_fd = open(rcmd->file, rcmd->mode);
+    dup2(redir_fd, rcmd->fd);
     runcmd(rcmd->cmd);
     break;
 
