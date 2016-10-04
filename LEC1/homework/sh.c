@@ -52,6 +52,7 @@ runcmd(struct cmd *cmd)
   struct pipecmd *pcmd;
   struct redircmd *rcmd;
   int redir_fd;
+  pid_t cpid;
 
   if(cmd == 0)
     exit(0);
@@ -73,18 +74,31 @@ runcmd(struct cmd *cmd)
   case '<':
     rcmd = (struct redircmd*)cmd;
     if (cmd->type == '>')
-	redir_fd = creat(rcmd->file, rcmd->mode);
+        redir_fd = creat(rcmd->file, rcmd->mode);
     else
-	redir_fd = open(rcmd->file, rcmd->mode);
+        redir_fd = open(rcmd->file, rcmd->mode);
     dup2(redir_fd, rcmd->fd);
     runcmd(rcmd->cmd);
     break;
 
   case '|':
     pcmd = (struct pipecmd*)cmd;
-    fprintf(stderr, "pipe not implemented\n");
-    // Your code here ...
-    break;
+    //fprintf(stderr, "pipe not implemented\n");
+    printf("%s\n",((struct execcmd*)pcmd->left)->argv[0]);
+    printf("%s\n",((struct execcmd*)pcmd->right)->argv[0]);
+    pipe(p);
+    cpid = fork();
+    if (cpid != 0) {
+        close(1);
+        dup(p[1]);
+        close(p[0]);
+        runcmd((struct cmd *)((struct execmd *)pcmd->left));
+    } else {
+        close(0);
+        dup(p[0]);
+        close(p[1]);
+        runcmd((struct cmd *)((struct execmd *)pcmd->right));
+    }    
   }
   exit(0);
 }
