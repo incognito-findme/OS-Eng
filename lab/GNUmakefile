@@ -47,6 +47,7 @@ GCCPREFIX := $(shell if i386-jos-elf-objdump -i 2>&1 | grep '^elf32-i386$$' >/de
 	echo "***" 1>&2; exit 1; fi)
 endif
 
+QEMU := /usr/local/bin/qemu-system-x86_64
 # try to infer the correct QEMU
 ifndef QEMU
 QEMU := $(shell if which qemu > /dev/null; \
